@@ -1,9 +1,9 @@
 FROM alpine:3.9
 
-ENV KUBECTL_VERSION 1.15.0
-ENV KUBECTL_URI https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
+# ENV KUBECTL_VERSION 1.15.0
+# ENV KUBECTL_URI https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
 ENV PATH="/:${PATH}"
-
+ADD kubectlv15.0 /kubectl
 RUN echo https://mirrors.ustc.edu.cn/alpine/v3.9/main > /etc/apk/repositories && \
 	  echo https://mirrors.ustc.edu.cn/alpine/v3.9/community >> /etc/apk/repositories; \
     apk update && \
@@ -32,8 +32,8 @@ RUN echo https://mirrors.ustc.edu.cn/alpine/v3.9/main > /etc/apk/repositories &&
   rm -rf /var/cache/apk/* && \
   pip install ijson awscli && \
   adduser -h /backup -D backup && \
-  curl -SL ${KUBECTL_URI} -o kubectl &&\
-  chmod +x kubectl 
+  # curl -SL ${KUBECTL_URI} -o kubectl &&\
+  chmod +x /kubectl 
 
 COPY entrypoint.sh /
 USER backup
