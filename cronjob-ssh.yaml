@@ -1,11 +1,3 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kube-backup
-  namespace: kube-system
-
----
-
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -27,19 +19,19 @@ spec:
           name: kube-backup
         spec:
           containers:
-          - image: quay.io/plange/kube-backup:1.12.0-1
+          - image: zeusro/kube-backup:1.12.0-1
             imagePullPolicy: Always
             name: backup
             resources: {}
-            securityContext:
-              runAsUser: 1000
+            # securityContext:
+            #   runAsUser: 1000
             env:
             - name: GIT_REPO
               value: "git@git.example.com:infra/kube-backup.git"
             volumeMounts:
-            - mountPath: /backup/
+            - mountPath: /root/
               name: cache
-            - mountPath: /backup/.ssh
+            - mountPath: /root/.ssh
               name: sshkey
           dnsPolicy: ClusterFirst
           terminationGracePeriodSeconds: 30
@@ -47,7 +39,7 @@ spec:
           volumes:
           - name: sshkey
             secret:
-              defaultMode: 420
+              defaultMode: 256
               secretName: kube-backup-ssh
           - name: cache
             emptyDir: {}
