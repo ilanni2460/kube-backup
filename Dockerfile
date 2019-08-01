@@ -31,10 +31,10 @@ RUN echo https://mirrors.ustc.edu.cn/alpine/v3.9/main > /etc/apk/repositories &&
   apk del libressl-dev make g++ && \
   rm -rf /var/cache/apk/* && \
   pip install ijson awscli && \
-  adduser -h /backup -D backup && \
+#   adduser -h /backup -D backup && \
   # curl -SL ${KUBECTL_URI} -o kubectl &&\
   chmod +x /kubectl 
 
 COPY entrypoint.sh /
-USER backup
+# USER backup
 ENTRYPOINT ["/entrypoint.sh"]

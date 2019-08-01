@@ -9,7 +9,7 @@ GLOBALRESOURCES="${GLOBALRESOURCES:-"namespace storageclass clusterrole clusterr
 
 # Initialize git repo
 [ -z "$DRY_RUN" ] && [ -z "$GIT_REPO" ] && echo "Need to define GIT_REPO environment variable" && exit 1
-GIT_REPO_PATH="${GIT_REPO_PATH:-"/backup/git"}"
+GIT_REPO_PATH="${GIT_REPO_PATH:-"/backup"}"
 GIT_PREFIX_PATH="${GIT_PREFIX_PATH:-"."}"
 GIT_USERNAME="${GIT_USERNAME:-"kube-backup"}"
 GIT_EMAIL="${GIT_EMAIL:-"kube-backup@example.com"}"
@@ -18,13 +18,14 @@ GITCRYPT_ENABLE="${GITCRYPT_ENABLE:-"false"}"
 GITCRYPT_PRIVATE_KEY="${GITCRYPT_PRIVATE_KEY:-"/secrets/gpg-private.key"}"
 GITCRYPT_SYMMETRIC_KEY="${GITCRYPT_SYMMETRIC_KEY:-"/secrets/symmetric.key"}"
 
-if [[ ! -f /backup/.ssh/id_rsa ]]; then
+if [[ ! -f ~/.ssh/id_rsa ]]; then
     git config --global credential.helper '!aws codecommit credential-helper $@'
     git config --global credential.UseHttpPath true
 fi
 [ -z "$DRY_RUN" ] && git config --global user.name "$GIT_USERNAME"
 [ -z "$DRY_RUN" ] && git config --global user.email "$GIT_EMAIL"
 
+# 拉取到 GIT_REPO_PATH 目录下面
 [ -z "$DRY_RUN" ] && (test -d "$GIT_REPO_PATH" || git clone --depth 1 "$GIT_REPO" "$GIT_REPO_PATH" --branch "$GIT_BRANCH" || git clone "$GIT_REPO" "$GIT_REPO_PATH")
 cd "$GIT_REPO_PATH"
 [ -z "$DRY_RUN" ] && (git checkout "${GIT_BRANCH}" || git checkout -b "${GIT_BRANCH}")
@@ -33,6 +34,7 @@ mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
 cd "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
 
 if [ "$GITCRYPT_ENABLE" = "true" ]; then
+    echo "git-crypt unlock"
     if [ -f "$GITCRYPT_PRIVATE_KEY" ]; then
         gpg --allow-secret-key-import --import "$GITCRYPT_PRIVATE_KEY"
         git-crypt unlock
@@ -44,6 +46,7 @@ if [ "$GITCRYPT_ENABLE" = "true" ]; then
     fi
 fi
 
+echo "git rm -r '*.yaml' --ignore-unmatch -f"
 [ -z "$DRY_RUN" ] && git rm -r '*.yaml' --ignore-unmatch -f
 
 # Start kubernetes state export
