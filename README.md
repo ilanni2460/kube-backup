@@ -1,5 +1,6 @@
-kube-backup
+kube-backup [中文版教程](readme_zh.md)
 ===========
+
 [![Docker Repository on Quay](https://quay.io/repository/plange/kube-backup/status "Docker Repository on Quay")](https://quay.io/repository/plange/kube-backup)
 [![Docker Repository on Docker Hub](https://img.shields.io/docker/automated/ptlange/kube-backup.svg "Docker Repository on Docker Hub")](https://hub.docker.com/r/ptlange/kube-backup/)
 
